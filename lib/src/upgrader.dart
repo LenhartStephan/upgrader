@@ -137,6 +137,11 @@ class Upgrader {
   /// is logging metrics for your app.
   WillDisplayUpgradeCallback? willDisplayUpgrade;
 
+  /// If you are using a router like go_router with MaterialApp.router, place
+  /// the UpgradeAlert inside the builder function of MaterialApp. Then pass the
+  /// navigatorKey from `routerConfig.routerDelegate.navigatorKey`.
+  GlobalKey<NavigatorState>? navigatorKey;
+
   /// The target operating system.
   final String _operatingSystem = UpgradeIO.operatingSystem;
 
@@ -184,6 +189,7 @@ class Upgrader {
     this.minAppVersion,
     this.dialogStyle = UpgradeDialogStyle.material,
     this.cupertinoButtonTextStyle,
+    this.navigatorKey,
     TargetPlatform? platform,
   })  : client = client ?? http.Client(),
         messages = messages ?? UpgraderMessages(),
@@ -440,7 +446,7 @@ class Upgrader {
         _displayed = true;
         Future.delayed(const Duration(milliseconds: 0), () {
           _showDialog(
-              context: context,
+              context: navigatorKey?.currentState?.context ?? context,
               title: messages.message(UpgraderMessage.title),
               message: message(),
               releaseNotes: shouldDisplayReleaseNotes() ? _releaseNotes : null,
